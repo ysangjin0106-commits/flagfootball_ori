@@ -1,5 +1,5 @@
 from state import GameState
-from logic.simulation import simulate_play
+from logic.play_resolver import PlayResolver
 from logic.ai import ai_choose_offense, ai_choose_defense
 from constants import (
     TD_YARDS, TOTAL_POSSESSIONS,
@@ -10,6 +10,8 @@ from constants import (
 
 _OFF_LIST = ["aggressive", "balanced", "conservative"]
 _DEF_LIST = ["blitz", "zone", "man"]
+
+_resolver = PlayResolver()   # 기본 rng (전역 random)
 
 
 # ──────────────────────────────────────────────
@@ -67,12 +69,12 @@ def execute_play(gs: GameState) -> None:
     gs.ai_last_defense = ai_def
 
     if gs.possession == "player":
-        result = simulate_play(gs.player_team, gs.ai_team, gs.selected_offense, ai_def)
+        result = _resolver.resolve(gs.player_team, gs.ai_team, gs.selected_offense, ai_def)
     else:
         # AI 공격 중에도 NRZ 적용
         if is_no_run_zone(gs) and ai_off == "conservative":
             ai_off = "balanced"
-        result = simulate_play(gs.ai_team, gs.player_team, ai_off, gs.selected_defense)
+        result = _resolver.resolve(gs.ai_team, gs.player_team, ai_off, gs.selected_defense)
 
     gs.anim_result = result
     gs.anim_frame  = 0

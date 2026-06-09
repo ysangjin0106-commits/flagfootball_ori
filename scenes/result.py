@@ -3,7 +3,8 @@ from typing import Optional
 from .base import BaseScene
 from state import GameState
 from controller import max_downs
-from ui.renderer import draw_text, draw_title, draw_scoreboard, draw_field
+from ui.renderer import draw_text, draw_title, draw_scoreboard
+from ui.field_renderer import FieldRenderer
 from data.strategies import OFFENSE_LABELS, DEFENSE_LABELS
 from constants import (
     YELLOW, GRAY, GOLD, WHITE, SCREEN_W, SCREEN_H,
@@ -15,6 +16,7 @@ class ResultScene(BaseScene):
     def __init__(self, gs: GameState, fonts: dict):
         self.gs = gs
         self.fonts = fonts
+        self._field = FieldRenderer()
 
     def handle_event(self, event: pygame.event.Event) -> Optional[str]:
         if event.type != pygame.KEYDOWN or event.key != pygame.K_RETURN:
@@ -34,8 +36,8 @@ class ResultScene(BaseScene):
         gs = self.gs
         draw_title(screen, "플레이 결과", self.fonts["lg"])
         draw_scoreboard(screen, gs.player_score, gs.ai_score, self.fonts["md"])
-        draw_field(screen, gs.ball_yard, gs.yards_to_go,
-                   gs.possession, gs.crossed_midfield, self.fonts["sm"])
+        self._field.draw(screen, gs.ball_yard, gs.yards_to_go,
+                         gs.possession, gs.crossed_midfield, self.fonts["sm"])
 
         base_y = FIELD_Y + FIELD_H + 12
 

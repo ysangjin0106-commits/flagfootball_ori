@@ -3,7 +3,8 @@ from typing import Optional
 from .base import BaseScene
 from state import GameState
 from controller import end_drive, max_downs
-from ui.renderer import draw_text, draw_title, draw_scoreboard, draw_field
+from ui.renderer import draw_text, draw_title, draw_scoreboard
+from ui.field_renderer import FieldRenderer
 from constants import GREEN, WHITE, YELLOW, GRAY, SCREEN_W, SCREEN_H
 
 # constants에 없는 색상을 직접 정의
@@ -16,6 +17,7 @@ class PuntScene(BaseScene):
     def __init__(self, gs: GameState, fonts: dict):
         self.gs    = gs
         self.fonts = fonts
+        self._field = FieldRenderer()
 
     def handle_event(self, event: pygame.event.Event) -> Optional[str]:
         if event.type != pygame.KEYDOWN:
@@ -41,8 +43,8 @@ class PuntScene(BaseScene):
         max_d = max_downs(gs)
         draw_title(screen, f"{max_d}다운! — 펀트 or 플레이?", self.fonts["lg"])
         draw_scoreboard(screen, gs.player_score, gs.ai_score, self.fonts["md"])
-        draw_field(screen, gs.ball_yard, gs.yards_to_go, gs.possession,
-                   gs.crossed_midfield, self.fonts["sm"])
+        self._field.draw(screen, gs.ball_yard, gs.yards_to_go,
+                         gs.possession, gs.crossed_midfield, self.fonts["sm"])
 
         mid = SCREEN_H // 2 - 40
 

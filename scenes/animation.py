@@ -4,7 +4,8 @@ from .base import BaseScene
 from .player_anim import build_play_anim, T_SNAP, T_DROP, T_THROW, T_LAND
 from state import GameState
 from controller import apply_play_result
-from ui.renderer import draw_text, draw_title, draw_scoreboard, draw_field, yard_to_px
+from ui.renderer import draw_text, draw_title, draw_scoreboard, yard_to_px
+from ui.field_renderer import FieldRenderer
 from constants import (
     WHITE, YELLOW, GRAY, SCREEN_W, FIELD_Y, FIELD_H, ANIM_DURATION
 )
@@ -32,6 +33,7 @@ class AnimationScene(BaseScene):
         self._off_anim: Optional[list] = None
         self._def_anim: Optional[list] = None
         self._ball_fn:  Optional[Callable] = None
+        self._field = FieldRenderer()
 
     # 새 플레이 시작 시 경로 구축
     def _build(self) -> None:
@@ -54,6 +56,8 @@ class AnimationScene(BaseScene):
         )
 
     def handle_event(self, event: pygame.event.Event) -> Optional[str]:
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            self.gs.anim_frame = ANIM_DURATION   # 즉시 완료로 점프
         return None
 
     def update(self) -> Optional[str]:
@@ -73,8 +77,8 @@ class AnimationScene(BaseScene):
 
         draw_title(screen, "플레이 진행 중...", self.fonts["lg"])
         draw_scoreboard(screen, gs.player_score, gs.ai_score, self.fonts["md"])
-        draw_field(screen, gs.ball_yard, gs.yards_to_go,
-                   gs.possession, gs.crossed_midfield, self.fonts["sm"])
+        self._field.draw(screen, gs.ball_yard, gs.yards_to_go,
+                         gs.possession, gs.crossed_midfield, self.fonts["sm"])
 
         off_team = gs.player_team if gs.possession == "player" else gs.ai_team
         is_run   = gs.anim_result.get("is_run", False) if gs.anim_result else False
