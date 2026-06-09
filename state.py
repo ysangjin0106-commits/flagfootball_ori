@@ -10,6 +10,8 @@ from constants import MIDFIELD, PLAYER_START_YARD
 class GameState:
     player_team:      List[Player]
     ai_team:          List[Player]
+    player_bench:     List[Player]
+    ai_bench:         List[Player]
     player_score:     int = 0
     ai_score:         int = 0
     possession:       str = "player"   # "player" | "ai"
@@ -34,6 +36,8 @@ class GameState:
 
 def new_state() -> GameState:
     return GameState(
-        player_team=PLAYER_POOL[:5],
-        ai_team=AI_PLAYER_POOL[:],
+        player_team  = list(PLAYER_POOL[:5]),
+        ai_team      = list(AI_PLAYER_POOL[:5]),
+        player_bench = list(PLAYER_POOL[5:]),
+        ai_bench     = list(AI_PLAYER_POOL[5:]),
     )
